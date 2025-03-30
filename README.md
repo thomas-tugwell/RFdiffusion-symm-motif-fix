@@ -2,6 +2,13 @@ This fork attempts to solve the [stochastic drift issue for symmetric motif inpu
 
 Changes made to: model_runners.py, utils.py and run_inference.py
 
+Set your RMSD threshold in utils.py:
+```
+if rms > 1.55:  # or whatever threshold you want
+  self._log.warning(f"Motif RMSD too high ({rms:.2f}) — rejecting sample.")
+  raise ValueError("Motif RMSD too high")
+```
+
 
 # RF*diffusion*
 
