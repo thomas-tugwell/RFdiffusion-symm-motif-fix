@@ -1,4 +1,4 @@
-This fork attempts to solve the [stochastic drift issue for symmetric motif input](https://github.com/RosettaCommons/RFdiffusion/issues/35). We set an RMSD threshold to the supplied motof and enforce this check each timestep along the diffusion. This problem is particularly prevalent for diffusing symmetric motifs.
+This fork attempts to solve the [stochastic drift issue for symmetric motif input](https://github.com/RosettaCommons/RFdiffusion/issues/35). We set an RMSD threshold to the supplied motif and enforce this check each timestep along the diffusion. This problem is particularly prevalent for diffusing symmetric motifs.
 
 Changes made to:
 model_runners.py
