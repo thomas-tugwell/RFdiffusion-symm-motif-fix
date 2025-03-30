@@ -81,6 +81,9 @@ def main(conf: HydraConfig) -> None:
             )
             continue
 
+        # ------------------------------------------------
+        # Initialize x_init and seq_init
+        # ------------------------------------------------
         x_init, seq_init = sampler.sample_init()
         denoised_xyz_stack = []
         px0_xyz_stack = []
@@ -89,15 +92,44 @@ def main(conf: HydraConfig) -> None:
 
         x_t = torch.clone(x_init)
         seq_t = torch.clone(seq_init)
+
+        # ------------------------------------------------
+        # (NEW) Our skip_design flag, default: False
+        # ------------------------------------------------
+        skip_design = False
+
         # Loop over number of reverse diffusion time steps.
         for t in range(int(sampler.t_step_input), sampler.inf_conf.final_step - 1, -1):
-            px0, x_t, seq_t, plddt = sampler.sample_step(
+            px0, x_t_new, seq_t_new, plddt = sampler.sample_step(
                 t=t, x_t=x_t, seq_init=seq_t, final_step=sampler.inf_conf.final_step
             )
+
+            # ------------------------------------------------
+            # If px0 is None => likely motif RMSD too high
+            # ------------------------------------------------
+            if px0 is None:
+                log.info(
+                    f"Skipping design {i_des} due to motif RMSD rejection at timestep {t}."
+                )
+                skip_design = True
+                break
+
+            # Only update x_t and seq_t after successful step
+            x_t = x_t_new
+            seq_t = seq_t_new
+
             px0_xyz_stack.append(px0)
             denoised_xyz_stack.append(x_t)
             seq_stack.append(seq_t)
             plddt_stack.append(plddt[0])  # remove singleton leading dimension
+
+
+        # ------------------------------------------------
+        # (NEW) If skip_design => do not save anything,
+        #       proceed to next design
+        # ------------------------------------------------
+        if skip_design:
+            continue
 
         # Flip order for better visualization in pymol
         denoised_xyz_stack = torch.stack(denoised_xyz_stack)
@@ -192,3 +224,4 @@ def main(conf: HydraConfig) -> None:
 
 if __name__ == "__main__":
     main()
+
