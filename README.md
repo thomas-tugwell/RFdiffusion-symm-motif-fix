@@ -9,6 +9,10 @@ if rms > 1.55:  # or whatever threshold you want
   raise ValueError("Motif RMSD too high")
 ```
 
+Default number of tries to correct RMSD under threshold is 20. Edit this value in model_runners.py:
+```
+max_retries = 20
+```
 
 # RF*diffusion*
 
