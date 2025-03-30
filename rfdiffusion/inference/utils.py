@@ -346,7 +346,11 @@ class Denoise:
 
         # calculate rmsd
         rms = rmsd(A, rB)
-        self._log.info(f"Sampled motif RMSD: {rms:.2f}")
+        self._log.info(f"CHECK: Sampled motif RMSD: {rms:.2f}")
+
+        if rms > 1.55:  # or whatever threshold you want
+            self._log.warning(f"Motif RMSD too high ({rms:.2f}) — rejecting sample.")
+            raise ValueError("Motif RMSD too high")
 
         # 2 rotate whole px0 by rotation matrix
         atom_mask = atom_mask.cpu()
